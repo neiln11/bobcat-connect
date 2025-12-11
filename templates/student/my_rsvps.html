@@ -1,49 +1,84 @@
-{% extends "/base/base.html" %}
+{% extends "base/base.html" %}
 
 {% block content %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
 <div class="container mt-4">
-    <h2>My RSVPs</h2>
-    
-    <div class="mb-3 text-end">
-        <a href="#" class="btn btn-outline-primary">
-            <i class="bi bi-calendar"></i> Calendar View
-        </a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>My RSVPs</h2>
+        <div class="btn-group" role="group">
+            <input type="radio" class="btn-check" name="viewBtn" id="btnList" autocomplete="off" checked onclick="showList()">
+            <label class="btn btn-outline-primary" for="btnList"><i class="bi bi-list-ul"></i> List</label>
+
+            <input type="radio" class="btn-check" name="viewBtn" id="btnCal" autocomplete="off" onclick="showCalendar()">
+            <label class="btn btn-outline-primary" for="btnCal"><i class="bi bi-calendar3"></i> Calendar</label>
+        </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
-            <h4>Upcoming Events</h4>
-        </div>
-        <div class="card-body">
-            {% if events %}
-                <div class="list-group">
-                {% for event in events %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-1">{{ event.title }}</h5>
-                            <p class="mb-1 text-muted">
-                                <i class="bi bi-clock"></i> {{ event.date }} | 
-                                <i class="bi bi-geo-alt"></i> {{ event.location }}
-                            </p>
+    <div id="listView">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Upcoming Events</h4>
+            </div>
+            <div class="card-body">
+                {% if events %}
+                    <div class="list-group">
+                    {% for event in events %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1">{{ event.event_title }}</h5>
+                                <p class="mb-1 text-muted small">
+                                    <i class="bi bi-clock"></i> {{ event.event_date.strftime('%B %d, %Y at %I:%M %p') }} | 
+                                    <i class="bi bi-geo-alt"></i> {{ event.event_location }}
+                                </p>
+                            </div>
+                            <a href="{{ url_for('student.event_detail', post_id=event.id) }}" class="btn btn-sm btn-info text-white">View Details</a>
                         </div>
-                        <a href="{{ url_for('student.event_detail', event_id=event.id) }}" class="btn btn-sm btn-info">View Details</a>
+                    {% endfor %}
                     </div>
-                {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-muted">You haven't RSVP'd to any upcoming events yet.</p>
-                <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">Discover Events</a>
-            {% endif %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <p class="text-muted">You haven't RSVP'd to any upcoming events yet.</p>
+                        <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary">Discover Events</a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-header bg-secondary text-white">
-            <h4>Past Events Attended</h4>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">No past events history available.</p>
+    <div id="calendarView" style="display: none;">
+        <div class="card shadow-sm">
+            <div class="card-body p-3">
+                <div id='calendar'></div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek'
+        },
+        themeSystem: 'bootstrap5',
+        events: '/student/api/my-rsvps', // Fetches data from your new Python route
+        height: 600
+    });
+
+    function showList() {
+        document.getElementById('listView').style.display = 'block';
+        document.getElementById('calendarView').style.display = 'none';
+    }
+
+    function showCalendar() {
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('calendarView').style.display = 'block';
+        // Render calendar after it becomes visible
+        setTimeout(() => { calendar.render(); }, 100); 
+    }
+</script>
 {% endblock %}

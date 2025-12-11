@@ -1,0 +1,83 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="bi bi-pencil-square"></i> Create New Post</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label for="image" class="form-label">Post Image</label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                    <div class="form-text">Optional. If empty, a default image will be used.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="caption" class="form-label">Caption / Description</label>
+                    <textarea class="form-control" id="caption" name="caption" rows="3" required placeholder="What's on your mind?"></textarea>
+                </div>
+
+                <div class="mb-3 form-check form-switch p-3 bg-light rounded border">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" id="is_event" name="is_event">
+                    <label class="form-check-label fw-bold" for="is_event">Is this an Event?</label>
+                    <div class="form-text ms-1">Toggle this on if you want students to RSVP to a specific time and place.</div>
+                </div>
+
+                <div id="event-fields" style="display: none;" class="border-start border-4 border-primary ps-3 mb-4 ms-2">
+                    <h5 class="mb-3 text-primary">Event Details</h5>
+                    
+                    <div class="mb-3">
+                        <label for="event_title" class="form-label">Event Title</label>
+                        <input type="text" class="form-control" id="event_title" name="event_title" placeholder="e.g. Intro to Python Workshop">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="date" class="form-label">Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="date" name="date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" placeholder="e.g. COB2 140">
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('club.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-send"></i> Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const checkbox = document.getElementById('is_event');
+    const eventFields = document.getElementById('event-fields');
+    const eventInputs = eventFields.querySelectorAll('input');
+
+    function toggleFields() {
+        if (checkbox.checked) {
+            eventFields.style.display = 'block';
+            // Make event fields required if it is an event
+            eventInputs.forEach(input => input.required = true);
+        } else {
+            eventFields.style.display = 'none';
+            eventInputs.forEach(input => input.required = false);
+        }
+    }
+
+    checkbox.addEventListener('change', toggleFields);
+    
+    // Run once on load to set initial state
+    toggleFields();
+</script>
+{% endblock %}

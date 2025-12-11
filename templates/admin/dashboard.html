@@ -1,0 +1,69 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-shield-lock"></i> Admin Dashboard</h2>
+        <div class="btn-group">
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-primary">
+                <i class="bi bi-globe"></i> View Global Feed
+            </a>
+            <a href="{{ url_for('admin.manage_users') }}" class="btn btn-outline-dark">
+                <i class="bi bi-people-fill"></i> Manage Users
+            </a>
+        </div>
+    </div>
+    
+    <div class="row my-4">
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h4>{{ total_users }} Users</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h4>{{ total_clubs }} Clubs</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Pending Approvals</h4>
+    {% if pending_clubs %}
+    <table class="table table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Club Name</th>
+                <th>Status Issue</th>
+                <th>Owner ID</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for club in pending_clubs %}
+            <tr>
+                <td class="fw-bold">{{ club.name }}</td>
+                <td>
+                    {% if not club.verified %}
+                        <span class="badge bg-danger">New Club (Hidden)</span>
+                    {% elif not club.officer_verified %}
+                        <span class="badge bg-warning text-dark">Officer Claim (Visible)</span>
+                    {% endif %}
+                </td>
+                <td>{{ club.owner_id }}</td>
+                <td>
+                    <a href="{{ url_for('admin.verify_club', club_id=club.id) }}" class="btn btn-sm btn-success">
+                        <i class="bi bi-check-lg"></i> Approve
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="alert alert-success">No pending approvals. Good job!</div>
+    {% endif %}
+</div>
+{% endblock %}

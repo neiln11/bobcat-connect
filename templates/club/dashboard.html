@@ -1,0 +1,140 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3" style="border-color: var(--border-color) !important;">
+        <div class="d-flex align-items-center gap-3">
+            {% if club.image_file and club.image_file != 'default_club.jpg' %}
+                <img src="{{ url_for('static', filename='posts/' + club.image_file) }}" 
+                     class="rounded-circle border" 
+                     style="width: 60px; height: 60px; object-fit: cover;">
+            {% else %}
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white border" 
+                     style="width: 60px; height: 60px; font-size: 2rem;">
+                    {{ club.name[0] }}
+                </div>
+            {% endif %}
+            
+            <div>
+                <h2 class="mb-0 fw-bold">{{ club.name }}</h2>
+                <div class="mt-1">
+                    {% if not club.verified %}
+                        <span class="badge bg-danger">Pending Verification</span>
+                    {% elif not club.officer_verified %}
+                        <span class="badge bg-warning">Rights Pending</span>
+                    {% else %}
+                        <span class="badge bg-success">Verified Club</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a href="{{ url_for('club.settings') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-gear-fill"></i> Settings
+            </a>
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-info">
+                <i class="bi bi-globe"></i> Public Feed
+            </a>
+        </div>
+    </div>
+
+    {% if not club.officer_verified %}
+    <div class="alert alert-warning border-warning d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>
+            <strong>Access Restricted:</strong> You have claimed this club, but an Admin must verify your officer status before you can post.
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row g-3 mb-5">
+        <div class="col-md-3">
+            <div class="card h-100 text-center p-3">
+                <h3 class="display-5 fw-bold mb-0">{{ real_follower_count }}</h3>
+                <small class="text-muted text-uppercase fw-bold">App Followers</small>
+                <a href="{{ url_for('club.manage_followers') }}" class="btn btn-sm btn-primary mt-3 w-100">
+                    Manage
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 text-center p-3">
+                <h3 class="display-5 fw-bold mb-0">{{ club.member_count }}</h3>
+                <small class="text-muted text-uppercase fw-bold">Total Members</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 text-center p-3">
+                <h3 class="display-5 fw-bold mb-0">{{ club.posts|length }}</h3>
+                <small class="text-muted text-uppercase fw-bold">Posts Created</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 d-flex align-items-center justify-content-center p-3" style="background-color: rgba(29, 155, 240, 0.1) !important; border-color: var(--primary-blue) !important;">
+                {% if club.officer_verified %}
+                    <a href="{{ url_for('club.create_event') }}" class="btn btn-primary btn-lg w-100 h-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-plus-lg"></i> Create Post
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary w-100 h-100" disabled>
+                        <i class="bi bi-lock-fill"></i> Locked
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3 border-bottom pb-2">Your Activity</h4>
+    
+    <div class="list-group shadow-sm">
+        {% for post in club.posts|sort(attribute='created_at', reverse=True) %}
+        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+            <div class="d-flex align-items-center gap-3">
+                {% if post.is_event %}
+                    <div class="text-center text-danger border border-danger rounded p-2 bg-transparent" style="width: 60px;">
+                        <small class="fw-bold d-block text-uppercase" style="font-size: 0.7rem;">{{ post.event_date.strftime('%b') if post.event_date else '??' }}</small>
+                        <span class="fw-bold fs-5">{{ post.event_date.strftime('%d') if post.event_date else '??' }}</span>
+                    </div>
+                {% else %}
+                    <div class="rounded p-2 text-center border border-secondary" style="width: 60px; height: 60px; display: grid; place-items: center;">
+                        <i class="bi bi-image text-muted fs-4"></i>
+                    </div>
+                {% endif %}
+                
+                <div>
+                    <div class="fw-bold fs-5">
+                        {{ post.event_title if post.is_event else "Social Post" }}
+                    </div>
+                    <div class="text-muted small">
+                        {{ post.caption[:60] }}...
+                    </div>
+                    <div class="text-muted" style="font-size: 0.75rem;">
+                        <i class="bi bi-clock"></i> Posted on {{ post.created_at.strftime('%Y-%m-%d') }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="{{ url_for('club.edit_post', post_id=post.id) }}" class="btn btn-sm btn-outline-secondary">
+                    Edit
+                </a>
+                {% if post.is_event %}
+                    <a href="{{ url_for('club.post_rsvps', post_id=post.id) }}" class="btn btn-sm btn-outline-primary">
+                        RSVPs <span class="badge bg-primary ms-1">{{ post.rsvps|length }}</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        {% else %}
+            <div class="text-center py-5 border rounded" style="border-style: dashed !important;">
+                <i class="bi bi-mailbox display-4 text-muted"></i>
+                <p class="mt-3 text-muted">You haven't posted anything yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

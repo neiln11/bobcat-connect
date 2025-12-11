@@ -1,15 +1,13 @@
 {% extends "base/base.html" %}
-
 {% block content %}
 <div class="container-fluid mt-4 px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Campus Organizations</h2>
         <input type="text" id="clubSearch" class="form-control w-25" placeholder="Search clubs...">
     </div>
-
     <div class="table-responsive shadow-sm border-0">
         <table class="table table-hover align-middle" id="clubsTable">
-            <thead class="table-light">
+            <thead>
                 <tr>
                     <th scope="col" style="width: 25%;">Organization</th>
                     <th scope="col">Category</th>
@@ -27,32 +25,12 @@
                             {{ club.name }}
                         </a>
                     </td>
+                    <td><span class="badge bg-secondary bg-opacity-10 text-dark border text-wrap">{{ club.category }}</span></td>
+                    <td class="text-muted small">{{ club.meeting_time or 'TBD' }}</td>
+                    <td class="text-muted small">{{ club.location or 'TBD' }}</td>
+                    <td class="text-center">{{ club.member_count }}</td>
                     <td>
-                        <span class="badge bg-secondary bg-opacity-10 text-dark border text-wrap">
-                            {{ club.category }}
-                        </span>
-                    </td>
-                    <td class="text-muted small">
-                        {% if club.meeting_time and club.meeting_time != 'TBD' %}
-                            <i class="bi bi-clock"></i> {{ club.meeting_time }}
-                        {% else %}
-                            <span class="text-muted fst-italic">TBD</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-muted small">
-                        {% if club.location and club.location != 'TBD' %}
-                            <i class="bi bi-geo-alt"></i> {{ club.location }}
-                        {% else %}
-                            <span class="text-muted fst-italic">TBD</span>
-                        {% endif %}
-                    </td>
-                    <td class="text-center">
-                        {{ club.member_count }}
-                    </td>
-                    <td>
-                        <a href="{{ url_for('student.club_detail', club_name_slug=club.name|replace(' ', '_')) }}" class="btn btn-sm btn-outline-primary">
-                            View Details
-                        </a>
+                        <a href="{{ url_for('student.club_detail', club_name_slug=club.name|replace(' ', '_')) }}" class="btn btn-sm btn-outline-primary">View</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -60,18 +38,11 @@
         </table>
     </div>
 </div>
-
 <script>
     document.getElementById('clubSearch').addEventListener('keyup', function() {
         var searchQuery = this.value.toLowerCase();
-        var rows = document.querySelectorAll('.club-row');
-        rows.forEach(function(row) {
-            var text = row.innerText.toLowerCase();
-            if (text.includes(searchQuery)) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
+        document.querySelectorAll('.club-row').forEach(function(row) {
+            row.style.display = row.innerText.toLowerCase().includes(searchQuery) ? '' : 'none';
         });
     });
 </script>

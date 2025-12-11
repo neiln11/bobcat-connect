@@ -1,117 +1,102 @@
 {% extends "base/base.html" %}
-
 {% block content %}
 <div class="row">
     <div class="col-md-3 d-none d-md-block">
         <div class="list-group sticky-top" style="top: 20px;">
-            <a href="{{ url_for('student.dashboard') }}" class="list-group-item list-group-item-action {% if feed_type == 'global' %}active{% endif %}">
-                <i class="bi bi-globe"></i> Global Feed
-            </a>
-            <a href="{{ url_for('student.following_feed') }}" class="list-group-item list-group-item-action {% if feed_type == 'following' %}active{% endif %}">
-                <i class="bi bi-people-fill"></i> My Following
-            </a>
-            <a href="{{ url_for('student.my_rsvps') }}" class="list-group-item list-group-item-action">
-                <i class="bi bi-calendar-check"></i> My Schedule
-            </a>
+            <a href="{{ url_for('student.dashboard') }}" class="list-group-item list-group-item-action {% if feed_type == 'global' %}active{% endif %}"><i class="bi bi-globe"></i> Global Feed</a>
+            <a href="{{ url_for('student.following_feed') }}" class="list-group-item list-group-item-action {% if feed_type == 'following' %}active{% endif %}"><i class="bi bi-people-fill"></i> My Following</a>
+            <a href="{{ url_for('student.my_rsvps') }}" class="list-group-item list-group-item-action"><i class="bi bi-calendar-check"></i> My Schedule</a>
         </div>
     </div>
-
     <div class="col-md-8">
-        <h3 class="mb-4">
-            {% if feed_type == 'following' %}
-                Posts from Clubs You Follow
-            {% else %}
-                Campus Activity Feed
-            {% endif %}
-        </h3>
+        <form action="{{ url_for('student.dashboard') }}" method="GET" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search..." value="{{ search_query or '' }}">
+                <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Search</button>
+                {% if search_query %}<a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary">Clear</a>{% endif %}
+            </div>
+        </form>
 
         {% if events %}
             {% for post in events %}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
-                            {{ post.club.name[0] }}
-                        </div>
+                        {% if post.club.image_file and post.club.image_file != 'default_club.jpg' %}
+                            <img src="{{ url_for('static', filename='posts/' + post.club.image_file) }}" class="rounded-circle border me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-2 text-white" style="width: 40px; height: 40px;">{{ post.club.name[0] }}</div>
+                        {% endif %}
+                        
                         <div>
-                            <a href="{{ url_for('student.club_detail', club_name_slug=post.club.name|replace(' ', '_')) }}" class="fw-bold text-dark text-decoration-none">
-                                {{ post.club.name }}
-                            </a>
-                            {% if post.club.id in followed_club_ids %}
-                                <i class="bi bi-patch-check-fill text-primary small" title="Following"></i>
-                            {% endif %}
+                            <a href="{{ url_for('student.club_detail', club_name_slug=post.club.name|replace(' ', '_')) }}" class="fw-bold text-dark text-decoration-none">{{ post.club.name }}</a>
+                            {% if post.club.id in followed_club_ids %}<i class="bi bi-patch-check-fill text-primary small"></i>{% endif %}
                             <div class="text-muted small">{{ post.created_at.strftime('%B %d at %I:%M %p') }}</div>
                         </div>
                     </div>
-                    
-                    {% if post.is_event %}
-                        <span class="badge bg-danger">EVENT</span>
-                    {% else %}
-                        <span class="badge bg-light text-dark">POST</span>
-                    {% endif %}
+                    <div>
+                        {% if post.is_event %}<span class="badge bg-danger">EVENT</span>{% else %}<span class="badge bg-light text-dark">POST</span>{% endif %}
+                        {% if current_user.role == 'admin' %}
+                        <form action="{{ url_for('admin.delete_post', post_id=post.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Delete?');">
+                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
                 </div>
-
                 <div class="card-body">
                     {% if post.image_file and post.image_file != 'default.jpg' %}
-                        <div class="mb-3 rounded overflow-hidden border">
-                            <img src="{{ url_for('static', filename='posts/' + post.image_file) }}" class="img-fluid w-100" alt="Post Image">
-                        </div>
+                        <div class="mb-3 rounded overflow-hidden border"><img src="{{ url_for('static', filename='posts/' + post.image_file) }}" class="img-fluid w-100"></div>
                     {% endif %}
-
                     {% if post.is_event %}
-                        <div class="alert alert-light border d-flex align-items-center" role="alert">
+                        <div class="alert alert-light border d-flex align-items-center">
                             <div class="me-3 text-center text-danger">
-                                {% if post.event_date %}
-                                    <h4 class="mb-0 fw-bold">{{ post.event_date.strftime('%b') }}</h4>
-                                    <h2 class="mb-0 fw-bold lh-1">{{ post.event_date.strftime('%d') }}</h2>
-                                {% else %}
-                                    <i class="bi bi-calendar-event fs-1"></i>
-                                {% endif %}
+                                <h4 class="mb-0 fw-bold">{{ post.event_date.strftime('%b') if post.event_date else '?' }}</h4>
+                                <h2 class="mb-0 fw-bold lh-1">{{ post.event_date.strftime('%d') if post.event_date else '?' }}</h2>
                             </div>
                             <div class="border-start ps-3">
                                 <h5 class="alert-heading mb-1">{{ post.event_title }}</h5>
-                                <p class="mb-0 text-muted small">
-                                    <i class="bi bi-geo-alt-fill"></i> {{ post.event_location or 'TBD' }} 
-                                    {% if post.event_date %}
-                                        | <i class="bi bi-clock-fill"></i> {{ post.event_date.strftime('%I:%M %p') }}
-                                    {% endif %}
-                                </p>
+                                <p class="mb-0 text-muted small"><i class="bi bi-geo-alt-fill"></i> {{ post.event_location }} | {{ post.event_date.strftime('%I:%M %p') if post.event_date else '' }}</p>
                             </div>
                         </div>
                     {% endif %}
-
                     <p class="card-text">{{ post.caption }}</p>
                 </div>
-
                 <div class="card-footer bg-white border-top-0 pt-0 pb-3">
                     <div class="d-flex gap-2">
                         {% if post.is_event %}
                             <form action="{{ url_for('student.toggle_rsvp', post_id=post.id) }}" method="POST" class="flex-grow-1">
                                 {% if post.id in user_rsvps %}
-                                    <button type="submit" class="btn btn-success w-100 btn-sm">
-                                        <i class="bi bi-check-circle-fill"></i> Going
-                                    </button>
+                                    <button class="btn btn-success w-100 btn-sm">Going</button>
                                 {% else %}
-                                    <button type="submit" class="btn btn-outline-primary w-100 btn-sm">
-                                        <i class="bi bi-calendar-plus"></i> RSVP
-                                    </button>
+                                    <button class="btn btn-outline-primary w-100 btn-sm">RSVP</button>
                                 {% endif %}
                             </form>
                         {% endif %}
-                        
-                        <button class="btn btn-outline-secondary btn-sm flex-grow-1"><i class="bi bi-heart"></i> Like</button>
-                        <button class="btn btn-outline-secondary btn-sm flex-grow-1"><i class="bi bi-share"></i> Share</button>
+                        <button class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="toggleLike(this, {{ post.id }})">
+                            {% if post.id in user_likes %}<i class="bi bi-heart-fill text-danger"></i>{% else %}<i class="bi bi-heart"></i>{% endif %}
+                            <span class="like-count">{{ post.likes|length }}</span> Likes
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm flex-grow-1">Share</button>
                     </div>
                 </div>
             </div>
             {% endfor %}
         {% else %}
-            <div class="text-center py-5">
-                <i class="bi bi-newspaper display-1 text-muted"></i>
-                <h3 class="mt-3 text-muted">No posts yet</h3>
-                <p>Follow clubs or verify the database seed.</p>
-            </div>
+            <div class="text-center py-5">No posts yet.</div>
         {% endif %}
     </div>
 </div>
+<script>
+function toggleLike(btn, postId) {
+    fetch('/student/like/' + postId, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+        const icon = btn.querySelector('i');
+        const count = btn.querySelector('.like-count');
+        count.innerText = data.likes_count;
+        if(data.liked){ icon.className='bi bi-heart-fill text-danger'; }
+        else{ icon.className='bi bi-heart'; }
+    });
+}
+</script>
 {% endblock %}

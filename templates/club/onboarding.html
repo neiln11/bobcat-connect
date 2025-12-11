@@ -1,0 +1,34 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3><i class="bi bi-rocket-takeoff"></i> Setup Your Club Profile</h3>
+        </div>
+        <div class="card-body">
+            <p>Enter your club's details. If the club already exists in our system, you will claim ownership of it.</p>
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Club Name (Exact match to claim)</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select">
+                        <option>Academic</option>
+                        <option>Social</option>
+                        <option>Cultural</option>
+                        <option>Sports</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea name="description" class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success w-100">Create / Claim Club</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

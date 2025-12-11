@@ -1,0 +1,224 @@
+/* TWITTER (X) DARK MODE PALETTE - FORCE OVERRIDE */
+:root {
+    --bg-color: #15202b !important;
+    --card-bg: #192734 !important;
+    --text-main: #ffffff !important;
+    --text-muted: #8899a6 !important;
+    --border-color: #38444d !important;
+    --primary-blue: #1d9bf0 !important;
+    --primary-hover: #1a8cd8 !important;
+    --like-red: #f91880 !important;
+    --input-bg: #253341 !important;
+}
+
+/* --- GLOBAL RESETS --- */
+body, html {
+    background-color: var(--bg-color) !important;
+    color: var(--text-main) !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Force all text to be white unless specifically muted */
+h1, h2, h3, h4, h5, h6, p, span, div, li, td, th {
+    color: var(--text-main);
+}
+
+.text-dark, .text-body, .text-black {
+    color: var(--text-main) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+a {
+    color: var(--primary-blue);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* --- CARDS & CONTAINERS --- */
+.card {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.card-header, .card-footer {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    border-color: var(--border-color) !important;
+}
+
+.bg-white, .bg-light {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+}
+
+/* --- FORMS & INPUTS (Crucial for readability) --- */
+.form-control, .form-select, input, textarea, select {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #2c3f50 !important; /* Slightly lighter on focus */
+    border-color: var(--primary-blue) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 0 0 0.2rem rgba(29, 155, 240, 0.25) !important;
+}
+
+/* Fix placeholder text visibility */
+::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 1;
+}
+
+/* --- TABLES --- */
+.table {
+    color: var(--text-main) !important;
+    border-color: var(--border-color) !important;
+    background-color: transparent !important;
+}
+
+.table thead th {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+    border-bottom: 2px solid var(--border-color) !important;
+}
+
+.table tbody td {
+    background-color: transparent !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* --- LIST GROUPS --- */
+.list-group-item {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* --- DROPDOWNS --- */
+.dropdown-menu {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.dropdown-item {
+    color: var(--text-main) !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* --- BUTTONS & BADGES --- */
+.btn-primary {
+    background-color: var(--primary-blue) !important;
+    border-color: var(--primary-blue) !important;
+    border-radius: 9999px;
+    font-weight: bold;
+    color: white !important;
+}
+
+.btn-outline-secondary {
+    color: var(--text-muted) !important;
+    border-color: var(--border-color) !important;
+    border-radius: 9999px;
+}
+
+.btn-outline-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: var(--text-main) !important;
+}
+
+/* Fix for light badges being unreadable */
+.badge.bg-light {
+    background-color: var(--border-color) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--text-muted);
+}
+
+.badge.bg-warning {
+    color: #000 !important; /* Keep black text on yellow badges for contrast */
+}
+
+/* --- UTILITIES --- */
+hr {
+    background-color: var(--border-color) !important;
+    opacity: 1;
+}
+
+.bi-heart-fill.text-danger {
+    color: var(--like-red) !important;
+}
+/* --- FIX ALERTS (Readable text on colored backgrounds) --- */
+.alert-success {
+    background-color: rgba(25, 135, 84, 0.2) !important; /* Transparent Green */
+    color: #75b798 !important; /* Bright Green Text */
+    border-color: #198754 !important;
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+    color: #ea868f !important;
+    border-color: #dc3545 !important;
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    color: #ffda6a !important;
+    border-color: #ffc107 !important;
+}
+
+.alert-info {
+    background-color: rgba(13, 202, 240, 0.2) !important;
+    color: #6edff6 !important;
+    border-color: #0dcaf0 !important;
+}
+
+/* --- FIX ADMIN DASHBOARD TEXT --- */
+/* Force all list items and table text to white */
+.list-group-item, .table, th, td {
+    color: #ffffff !important;
+    background-color: var(--card-bg) !important;
+}
+
+/* Fix the "Close" button on alerts */
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Fix Club Profile Header Text */
+.club-header-text {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5); /* Adds readability */
+}
+/* --- FIX: EVENT DETAILS BOX IN FEED --- */
+/* Overrides Bootstrap's white alert box to match dark mode */
+.alert-light {
+    background-color: transparent !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-main) !important;
+}
+
+/* Ensure the red date text stays red and readable */
+.alert-light .text-danger {
+    color: var(--like-red) !important;
+}
+
+/* Fix any remaining white backgrounds */
+.bg-white {
+    background-color: var(--card-bg) !important;
+    color: var(--text-main) !important;
+}

@@ -1,0 +1,93 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width: 800px;">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h3><i class="bi bi-pencil"></i> Edit Post</h3>
+        </div>
+        <div class="card-body">
+            
+            {% if post.image_file and post.image_file != 'default.jpg' %}
+            <div class="mb-4 text-center">
+                <label class="form-label fw-bold d-block text-start">Current Image</label>
+                <img src="{{ url_for('static', filename='posts/' + post.image_file) }}" 
+                     class="img-fluid rounded border" 
+                     style="max-height: 300px; object-fit: cover;" 
+                     alt="Current Post Image">
+            </div>
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                
+                <div class="mb-3">
+                    <label for="image" class="form-label">
+                        {% if post.image_file and post.image_file != 'default.jpg' %}
+                            Change Image
+                        {% else %}
+                            Add an Image
+                        {% endif %}
+                    </label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                    <div class="form-text">Select a file to update the post's photo.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="caption" class="form-label">Caption / Description</label>
+                    <textarea class="form-control" id="caption" name="caption" rows="3" required>{{ post.caption }}</textarea>
+                </div>
+
+                <div class="mb-3 form-check form-switch p-3 bg-light rounded border">
+                    <input class="form-check-input ms-0 me-2" type="checkbox" id="is_event" name="is_event" {% if post.is_event %}checked{% endif %}>
+                    <label class="form-check-label fw-bold" for="is_event">Is this an Event?</label>
+                </div>
+
+                <div id="event-fields" style="display: {% if post.is_event %}block{% else %}none{% endif %};" class="border-start border-4 border-primary ps-3 mb-4 ms-2">
+                    <h5 class="mb-3 text-primary">Event Details</h5>
+                    
+                    <div class="mb-3">
+                        <label for="event_title" class="form-label">Event Title</label>
+                        <input type="text" class="form-control" id="event_title" name="event_title" value="{{ post.event_title or '' }}">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="date" class="form-label">Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="date" name="date" 
+                                   value="{{ post.event_date.strftime('%Y-%m-%dT%H:%M') if post.event_date else '' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" name="location" value="{{ post.event_location or '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ url_for('club.dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const checkbox = document.getElementById('is_event');
+    const eventFields = document.getElementById('event-fields');
+    const eventInputs = eventFields.querySelectorAll('input');
+
+    function toggleFields() {
+        if (checkbox.checked) {
+            eventFields.style.display = 'block';
+            eventInputs.forEach(input => input.required = true);
+        } else {
+            eventFields.style.display = 'none';
+            eventInputs.forEach(input => input.required = false);
+        }
+    }
+
+    checkbox.addEventListener('change', toggleFields);
+</script>
+{% endblock %}

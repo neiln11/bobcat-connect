@@ -2,12 +2,12 @@
 
 {% block content %}
 <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-secondary mb-3">
-    <i class="bi bi-arrow-left"></i> Back to Events
+    <i class="bi bi-arrow-left"></i> Back to Feed
 </a>
 
 <div class="card shadow">
     <div class="card-body p-4">
-        <h2 class="mb-3">{{ event.title }}</h2>
+        <h2 class="mb-3">{{ event.event_title }}</h2>
         
         <div class="mb-3">
             <span class="badge bg-primary">{{ event.club.name }}</span>
@@ -18,23 +18,31 @@
 
         <div class="row mb-4">
             <div class="col-md-6">
-                <p><strong><i class="bi bi-calendar"></i> Date:</strong> {{ event.event_datetime.strftime('%B %d, %Y') }}</p>
-                <p><strong><i class="bi bi-clock"></i> Time:</strong> {{ event.event_datetime.strftime('%I:%M %p') }}</p>
+                <p><strong><i class="bi bi-calendar"></i> Date:</strong> {{ event.event_date.strftime('%B %d, %Y') }}</p>
+                <p><strong><i class="bi bi-clock"></i> Time:</strong> {{ event.event_date.strftime('%I:%M %p') }}</p>
             </div>
             <div class="col-md-6">
-                <p><strong><i class="bi bi-geo-alt"></i> Location:</strong> {{ event.location }}</p>
+                <p><strong><i class="bi bi-geo-alt"></i> Location:</strong> 
+                    <a href="https://maps.google.com/?q={{ event.event_location }}" target="_blank">{{ event.event_location }}</a>
+                </p>
             </div>
         </div>
+
+        {% if event.image_file and event.image_file != 'default.jpg' %}
+            <div class="mb-4 text-center">
+                 <img src="{{ url_for('static', filename='posts/' + event.image_file) }}" class="img-fluid rounded" style="max-height: 400px;">
+            </div>
+        {% endif %}
 
         <hr>
 
         <h5>About This Event</h5>
-        <p>{{ event.description or 'No description provided.' }}</p>
+        <p>{{ event.caption }}</p>
 
         <hr>
 
         <div class="d-flex gap-2">
-            <form method="POST" action="{{ url_for('student.toggle_rsvp', event_id=event.id) }}" class="flex-grow-1">
+            <form method="POST" action="{{ url_for('student.toggle_rsvp', post_id=event.id) }}" class="flex-grow-1">
                 {% if has_rsvp %}
                     <button type="submit" class="btn btn-danger w-100">
                         <i class="bi bi-x-circle"></i> Cancel RSVP
@@ -46,17 +54,11 @@
                 {% endif %}
             </form>
 
-            <form method="POST" action="{{ url_for('student.toggle_follow', club_id=event.club_id) }}">
-                {% if is_following %}
-                    <button type="submit" class="btn btn-outline-danger">
-                        <i class="bi bi-heart-fill"></i> Unfollow Club
-                    </button>
-                {% else %}
-                    <button type="submit" class="btn btn-outline-primary">
-                        <i class="bi bi-heart"></i> Follow Club
-                    </button>
-                {% endif %}
-            </form>
+            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ event.event_title|urlencode }}&dates={{ event.event_date.strftime('%Y%m%dT%H%M00') }}/{{ event.event_date.strftime('%Y%m%dT%H%M00') }}&details={{ event.caption|urlencode }}&location={{ event.event_location|urlencode }}" 
+               target="_blank" 
+               class="btn btn-outline-primary">
+                <i class="bi bi-calendar-plus"></i> Add to Calendar
+            </a>
         </div>
     </div>
 </div>
